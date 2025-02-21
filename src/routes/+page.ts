@@ -1,16 +1,16 @@
-// Home page data loader - Loads the list of available courses
-import type { PageLoad } from './$types';
-import type { CoursesList } from '$lib/types';
+// src/routes/+page.ts
+// Just import and return the JSON - that's it!
 
-export const load: PageLoad = async () => {
-  try {
-    // Import the courses list from our data directory
-    const coursesList = await import('$lib/data/courses.json') as CoursesList;
-    return { courses: coursesList.courses };
-  } catch (error) {
-    return { 
-      courses: [],
-      error: 'Failed to load courses' 
-    };
-  }
-};
+//Working for typescript issue
+import coursesData from '$lib/data/courses.json';
+
+export const load = () => ({
+  courses: coursesData.courses
+});
+
+
+// Not working code, use this to fix the rest of the pages
+
+// import courses from '$lib/data/courses.json';
+
+// export const load = () => ({ courses });
