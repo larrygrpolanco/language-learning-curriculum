@@ -1,0 +1,10 @@
+{
+  "courses": [
+    {
+      "id": "korean",
+      "title": "Korean",
+      "description": "DLI/FSI Korean Language Course",
+      "moduleOrder": ["module-1", "module-2"]
+    }
+  ]
+}

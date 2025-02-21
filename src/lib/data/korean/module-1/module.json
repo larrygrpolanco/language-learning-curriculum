@@ -1,0 +1,6 @@
+{
+  "id": "module-1",
+  "title": "Basic Conversations",
+  "description": "Foundational conversation patterns and vocabulary",
+  "unitOrder": ["unit-1", "unit-2"]
+}

@@ -1,0 +1,23 @@
+{
+  "id": "unit-1",
+  "title": "Greetings",
+  "description": "Learn common Korean greetings",
+  "sectionOrder": ["section-1", "section-2"],
+  "sections": {
+    "section-1": {
+      "id": "section-1",
+      "title": "Basic Greetings",
+      "type": "comprehension",
+      "description": "Listen and learn basic Korean greetings",
+      "content": "In this section, we'll learn the most common greetings...",
+      "audio": "/audio/korean/module-1/unit-1/section-1.mp3",
+      "images": [
+        {
+          "src": "/images/korean/module-1/unit-1/textbook-1.jpg",
+          "alt": "Textbook page showing Korean greetings",
+          "caption": "Basic greetings vocabulary page"
+        }
+      ]
+    }
+  }
+}
