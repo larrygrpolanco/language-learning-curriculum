@@ -1,10 +1,11 @@
+<!-- src/routes/+page.svelte 
+Home page - Displays available courses -->
 <script lang="ts">
 	import type { PageData } from './$types';
 
 	export let data: PageData;
 </script>
 
-// src/routes/+page.svelte // Home page - Displays available courses
 <main class="container mx-auto px-4 py-8">
 	<h1 class="mb-8 text-3xl font-bold">Language Courses</h1>
 

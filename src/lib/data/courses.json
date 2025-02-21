@@ -3,7 +3,13 @@
     {
       "id": "korean",
       "title": "Korean",
-      "description": "DLI/FSI Korean Language Course",
+      "description": "Korean Basic Course",
+      "moduleOrder": ["module-1", "module-2"]
+    },
+    {
+      "id": "chinese",
+      "title": "Chinese",
+      "description": "Standard Chinese: A Modular Approach",
       "moduleOrder": ["module-1", "module-2"]
     }
   ]
