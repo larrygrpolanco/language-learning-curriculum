@@ -1,17 +1,9 @@
 // src/routes/+page.ts
-import { getCourseStructure } from '$lib/utils/fs';
-import { error } from '@sveltejs/kit';
+import type { PageLoad } from './$types';
+import { getCourses } from '$lib/courses';
+import type { CourseData } from '$lib/courses';
 
-export async function load() {
-  try {
-    // Get available courses by reading the courses directory
-    const courses = await Promise.all([
-      getCourseStructure('courses/korean'),
-      getCourseStructure('courses/mandarin')
-    ]);
-    
-    return { courses };
-  } catch (e) {
-    throw error(500, 'Failed to load courses');
-  }
-}
+export const load: PageLoad<{ courses: CourseData[] }> = async () => {
+  const courses = await getCourses();
+  return { courses };
+};
