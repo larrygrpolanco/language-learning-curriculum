@@ -10,6 +10,9 @@
 	let playing = false;
 	let playbackRate = 1;
 
+	// Reactive statement to manage paused state
+	$: paused = !playing;
+
 	// Update current time as audio plays
 	function handleTimeUpdate() {
 		currentTime = audio?.currentTime || 0;
@@ -23,7 +26,7 @@
 	}
 </script>
 
-// AudioPlayer.svelte // A reusable audio player component with advanced controls
+<!-- AudioPlayer.svelte -->
 <div class="flex w-full flex-col gap-2">
 	<div class="flex items-center justify-between">
 		<span class="font-medium">{title}</span>
@@ -39,13 +42,7 @@
 	</div>
 
 	<!-- Bind the audio element to our variable for control -->
-	<audio
-		bind:this={audio}
-		{src}
-		on:timeupdate={handleTimeUpdate}
-		bind:duration
-		bind:paused={!playing}
-	/>
+	<audio bind:this={audio} {src} on:timeupdate={handleTimeUpdate} bind:duration bind:paused></audio>
 
 	<!-- Progress bar and controls -->
 	<div class="flex items-center gap-2">

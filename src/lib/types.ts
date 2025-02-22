@@ -1,53 +1,38 @@
 // src/lib/types.ts
 
-// Basic shared properties
-interface BaseContent {
-  id: string;
+// Base interface for content metadata extracted from folder names
+export interface ContentMeta {
+  order: number;
   title: string;
-  description: string;
+  slug: string;
 }
 
-// Image type for consistency
-interface ImageContent {
-  src: string;
-  alt: string;
-  caption?: string;
+// Represents a section (like comprehension, production, etc.)
+export interface Section extends ContentMeta {
+  type: string;          // e.g., "comprehension", "production"
+  audioPath?: string;    // Path to audio file if it exists
+  imagePaths: string[];  // Array of paths to related images
 }
 
-// Section represents a single learning segment
-interface Section extends BaseContent {
-  type: 'comprehension' | 'production' | 'drill' | 'exercise' | 'dictation';
-  content: string;
-  audio?: string;
-  images?: ImageContent[];
+// Represents a unit (collection of sections)
+export interface Unit extends ContentMeta {
+  sections: Section[];
 }
 
-// Unit contains multiple sections
-interface Unit extends BaseContent {
-  sectionOrder: string[];
-  sections: Record<string, Section>;
+// Represents a module (collection of units)
+export interface Module extends ContentMeta {
+  units: Unit[];
 }
 
-// Module contains reference to multiple units
-interface Module extends BaseContent {
-  unitOrder: string[];
+// Represents a complete course
+export interface Course extends ContentMeta {
+  modules: Module[];
 }
 
-// Course is our top level structure
-interface Course extends BaseContent {
-  moduleOrder: string[];
+// Helper type for parsing folder names
+export interface ParsedPath {
+  order: number;
+  title: string;
+  type: string;  // Changed from optional to required
+  slug: string;
 }
-
-// This type represents our courses listing file
-interface CoursesList {
-  courses: Course[];
-}
-
-export type {
-  Course,
-  Module,
-  Unit,
-  Section,
-  ImageContent,
-  CoursesList
-};

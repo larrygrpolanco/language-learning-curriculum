@@ -1,5 +1,5 @@
 <!-- src/routes/[course]/+page.svelte -->
-<script>
+<script lang="ts">
     export let data;
 </script>
 
