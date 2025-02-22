@@ -4,17 +4,13 @@
  * Unit (e.g., Greetings) -> Section (e.g., Comprehension Practice)
  */
 
+
 /**
- * Defines valid section types for language learning content.
- * Each type represents a different learning activity.
+ * Sections can have any type string - this allows for maximum flexibility 
+ * in organizing content. Examples might be 'comprehension', 'conversation',
+ * 'vocabulary', or any other category that makes sense for the material.
  */
-export type SectionType = 
-  | 'comprehension'  // Listening and understanding exercises
-  | 'production'     // Speaking practice
-  | 'dictation'      // Writing what you hear
-  | 'drill'          // Repetitive practice exercises
-  | 'test'           // Assessment activities
-  | 'default';       // Generic content type
+export type SectionType = string;
 
 /**
  * Base interface providing common properties for all content levels.
