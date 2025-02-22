@@ -3,6 +3,6 @@
 import type { PageLoad } from './$types';
 
 export const load: PageLoad = async ({ parent }) => {
-    const { courses } = await parent();
-    return { courses };
-}
+	const { courses } = await parent();
+	return { courses };
+};
