@@ -1,4 +1,4 @@
-<!-- / src/routes/[course]/[module]/[unit]/+page.svelte -->
+<!-- src/routes/[course]/[module]/[unit]/+page.svelte -->
 <script lang="ts">
   import type { Course, Module, Unit } from '$lib/types';
   import AudioPlayer from '$lib/components/AudioPlayer.svelte';
@@ -11,10 +11,8 @@
     }
   }>();
 
-  // Track active section using Svelte 5's $state
   let activeSection = $state(data.unit.sections[0]?.order);
   
-  // Derive the currently selected section
   let currentSection = $derived(
     data.unit.sections.find(s => s.order === activeSection)
   );
@@ -27,7 +25,12 @@
       {data.course.title}
     </a>
     <span class="mx-2">›</span>
-    <span>{data.module.title}</span>
+    <a 
+      href="/{data.course.slug}/{data.module.slug}" 
+      class="text-blue-600 hover:underline"
+    >
+      {data.module.title}
+    </a>
     <span class="mx-2">›</span>
     <span>{data.unit.title}</span>
   </nav>
@@ -41,7 +44,7 @@
         class="px-4 py-2 {activeSection === section.order ? 
           'border-b-2 border-blue-500 text-blue-600' : 
           'text-gray-600 hover:text-gray-900'}"
-        on:click={() => activeSection = section.order}
+        onclick={() => activeSection = section.order}
       >
         {section.title}
       </button>

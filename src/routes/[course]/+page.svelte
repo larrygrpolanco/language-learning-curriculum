@@ -1,4 +1,4 @@
-<!-- src/routes/[course]/+page.svelte -->
+/ src/routes/[course]/+page.svelte
 <script lang="ts">
   import type { Course } from '$lib/types';
   

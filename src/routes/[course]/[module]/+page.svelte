@@ -1,4 +1,4 @@
-// src/routes/[course]/[module]/+page.svelte
+<!-- src/routes/[course]/[module]/+page.svelte -->
 <script lang="ts">
   import type { Course, Module } from '$lib/types';
   
@@ -21,14 +21,6 @@
   </nav>
 
   <h1 class="text-3xl font-bold mb-8">{data.module.title}</h1>
-
-  <!-- Module overview section -->
-  <div class="prose max-w-none mb-8">
-    <p class="text-lg text-gray-600">
-      This module contains {data.module.units.length} units focusing on 
-      {data.module.title.toLowerCase()} in {data.course.title}.
-    </p>
-  </div>
 
   <!-- Units grid -->
   <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
