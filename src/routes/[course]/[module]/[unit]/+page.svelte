@@ -1,6 +1,6 @@
 // src/routes/[course]/[module]/[unit]/+page.svelte
 <script lang="ts">
-  import type { Section } from '$lib/utils/fs-utils';
+  import type { Section } from '$lib/server/fs-utils';
   import AudioPlayer from '$lib/components/AudioPlayer.svelte';
   
   interface PageData {
