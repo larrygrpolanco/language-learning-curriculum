@@ -1,13 +1,11 @@
-<!-- src/routes/[course]/[module]/+page.svelte -->
+// src/routes/[course]/[module]/+page.svelte
 <script lang="ts">
   import type { Course, Module } from '$lib/types';
   
-  let { data } = $props<{
-    data: {
-      course: Course;
-      module: Module;
-    }
-  }>();
+  export let data: {
+    course: Course;
+    module: Module;
+  };
 </script>
 
 <div class="container mx-auto px-4 py-8">
@@ -24,7 +22,7 @@
 
   <!-- Units grid -->
   <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-    {#each data.module.units as unit (unit.slug)}
+    {#each data.module.units as unit}
       <a
         href="/{data.course.slug}/{data.module.slug}/{unit.slug}"
         class="block p-6 rounded-lg border hover:shadow-lg transition-shadow"
@@ -33,11 +31,11 @@
         
         <!-- Section preview -->
         <div class="space-y-2">
-          {#each unit.sections as section (section.order)}
+          {#each unit.sections as section}
             <div class="text-sm text-gray-600">
               <span class="inline-block w-6">{section.order}.</span>
               {section.title}
-              {#if section.type}
+              {#if section.type !== 'default'}
                 <span class="text-gray-400 ml-1">({section.type})</span>
               {/if}
             </div>

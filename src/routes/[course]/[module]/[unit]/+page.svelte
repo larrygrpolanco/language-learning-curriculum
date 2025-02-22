@@ -1,21 +1,15 @@
-<!-- src/routes/[course]/[module]/[unit]/+page.svelte -->
+<!-- // src/routes/[course]/[module]/[unit]/+page.svelte -->
 <script lang="ts">
   import type { Course, Module, Unit } from '$lib/types';
-  import AudioPlayer from '$lib/components/AudioPlayer.svelte';
   
-  let { data } = $props<{
-    data: {
-      course: Course;
-      module: Module;
-      unit: Unit;
-    }
-  }>();
+  export let data: {
+    course: Course;
+    module: Module;
+    unit: Unit;
+  };
 
-  let activeSection = $state(data.unit.sections[0]?.order);
-  
-  let currentSection = $derived(
-    data.unit.sections.find(s => s.order === activeSection)
-  );
+  let activeSection = data.unit.sections[0]?.order;
+  $: currentSection = data.unit.sections.find(s => s.order === activeSection);
 </script>
 
 <div class="container mx-auto px-4 py-8">
@@ -39,14 +33,17 @@
 
   <!-- Section tabs -->
   <div class="flex gap-2 border-b mb-6">
-    {#each data.unit.sections as section (section.order)}
+    {#each data.unit.sections as section}
       <button
         class="px-4 py-2 {activeSection === section.order ? 
           'border-b-2 border-blue-500 text-blue-600' : 
           'text-gray-600 hover:text-gray-900'}"
-        onclick={() => activeSection = section.order}
+        on:click={() => activeSection = section.order}
       >
         {section.title}
+        {#if section.type !== 'default'}
+          <span class="text-sm text-gray-500 ml-1">({section.type})</span>
+        {/if}
       </button>
     {/each}
   </div>
@@ -54,29 +51,34 @@
   <!-- Section content -->
   {#if currentSection}
     <div class="space-y-6">
-      <div class="prose max-w-none">
-        <h2 class="text-2xl font-semibold mb-4">
-          {currentSection.title}
-          {#if currentSection.type}
-            <span class="text-base font-normal text-gray-600 ml-2">
-              ({currentSection.type})
-            </span>
-          {/if}
-        </h2>
-      </div>
+      <h2 class="text-2xl font-semibold">
+        {currentSection.title}
+        {#if currentSection.type !== 'default'}
+          <span class="text-base font-normal text-gray-600 ml-2">
+            ({currentSection.type})
+          </span>
+        {/if}
+      </h2>
 
-      {#if currentSection.audioPath}
-        <AudioPlayer 
-          src={currentSection.audioPath}
-          title="Lesson Audio"
-        />
+      <!-- Audio files -->
+      {#if currentSection.audioFiles.length > 0}
+        <div class="space-y-4">
+          {#each currentSection.audioFiles as audioFile}
+            <div class="border rounded p-4">
+              <audio controls class="w-full">
+                <source src={audioFile} type="audio/mpeg">
+              </audio>
+            </div>
+          {/each}
+        </div>
       {/if}
 
-      {#if currentSection.imagePaths.length > 0}
+      <!-- Image files -->
+      {#if currentSection.imageFiles.length > 0}
         <div class="grid gap-4 md:grid-cols-2">
-          {#each currentSection.imagePaths as imagePath}
+          {#each currentSection.imageFiles as imageFile}
             <img 
-              src={imagePath}
+              src={imageFile} 
               alt="Lesson material"
               class="rounded-lg shadow-lg"
             />

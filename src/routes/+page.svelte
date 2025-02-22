@@ -1,8 +1,8 @@
-<!-- src/routes/+page.svelte -->
+<!-- // src/routes/+page.svelte -->
 <script lang="ts">
   import type { Course } from '$lib/types';
   
-  let { data } = $props<{ data: { courses: Course[] } }>();
+  export let data: { courses: Course[] };
 </script>
 
 <div class="container mx-auto px-4 py-8">
