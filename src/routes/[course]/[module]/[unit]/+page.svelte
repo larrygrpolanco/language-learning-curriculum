@@ -1,25 +1,37 @@
-// src/routes/[course]/[module]/[unit]/+page.svelte
+<!-- / src/routes/[course]/[module]/[unit]/+page.svelte -->
 <script lang="ts">
-  import type { Section } from '$lib/server/fs-utils';
+  import type { Course, Module, Unit } from '$lib/types';
   import AudioPlayer from '$lib/components/AudioPlayer.svelte';
   
-  interface PageData {
-    unit: {
-      title: string;
-      sections: Section[];
+  let { data } = $props<{
+    data: {
+      course: Course;
+      module: Module;
+      unit: Unit;
     }
-  }
+  }>();
 
-  let { data } = $props<{ data: PageData }>();
+  // Track active section using Svelte 5's $state
   let activeSection = $state(data.unit.sections[0]?.order);
-
+  
   // Derive the currently selected section
-  let selectedSection = $derived(
+  let currentSection = $derived(
     data.unit.sections.find(s => s.order === activeSection)
   );
 </script>
 
 <div class="container mx-auto px-4 py-8">
+  <!-- Breadcrumb navigation -->
+  <nav class="text-sm mb-6">
+    <a href="/{data.course.slug}" class="text-blue-600 hover:underline">
+      {data.course.title}
+    </a>
+    <span class="mx-2">›</span>
+    <span>{data.module.title}</span>
+    <span class="mx-2">›</span>
+    <span>{data.unit.title}</span>
+  </nav>
+
   <h1 class="text-3xl font-bold mb-6">{data.unit.title}</h1>
 
   <!-- Section tabs -->
@@ -37,21 +49,32 @@
   </div>
 
   <!-- Section content -->
-  {#if selectedSection}
+  {#if currentSection}
     <div class="space-y-6">
-      {#if selectedSection.audioSrc}
+      <div class="prose max-w-none">
+        <h2 class="text-2xl font-semibold mb-4">
+          {currentSection.title}
+          {#if currentSection.type}
+            <span class="text-base font-normal text-gray-600 ml-2">
+              ({currentSection.type})
+            </span>
+          {/if}
+        </h2>
+      </div>
+
+      {#if currentSection.audioPath}
         <AudioPlayer 
-          src={selectedSection.audioSrc}
-          title={selectedSection.title}
+          src={currentSection.audioPath}
+          title="Lesson Audio"
         />
       {/if}
 
-      {#if selectedSection.imageSrcs}
-        <div class="grid gap-4 grid-cols-1 md:grid-cols-2">
-          {#each selectedSection.imageSrcs as src}
+      {#if currentSection.imagePaths.length > 0}
+        <div class="grid gap-4 md:grid-cols-2">
+          {#each currentSection.imagePaths as imagePath}
             <img 
-              {src} 
-              alt={`${selectedSection.title} material`}
+              src={imagePath}
+              alt="Lesson material"
               class="rounded-lg shadow-lg"
             />
           {/each}
