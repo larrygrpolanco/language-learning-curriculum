@@ -1,125 +1,149 @@
-// src/lib/utils/fs.ts
-import type { ParsedPath, Course, Module, Unit, Section } from '$lib/types';
+import { promises as fs } from 'fs';
+import path from 'path';
+import type { Course, Module, Unit, Section } from '$lib/types';
+
+// Supported file extensions
+const AUDIO_EXTS = ['.mp3'];
+const IMAGE_EXTS = ['.jpg', '.jpeg', '.png'];
 
 /**
- * Creates a URL-friendly slug from a string
+ * Parses a folder name into its components (order, type, title)
+ * Example: "1-comprehension-basic" -> { order: 1, type: "comprehension", title: "Basic" }
  */
-function createSlug(str: string): string {
-  return str
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/(^-|-$)/g, '');
-}
-
-/**
- * Extracts metadata from a folder name
- */
-function parsePath(path: string, contentType: 'section' | 'module' | 'unit' = 'section'): ParsedPath {
-  const parts = path.split('-');
-  const order = parseInt(parts[0]);
+function parseFolderName(name: string) {
+  const parts = name.split('-');
+  const order = parseInt(parts[0], 10);
   
-  let type: string;
-  let titleParts: string[];
+  // For sections, type is the second part, for modules/units it's their level
+  const type = parts.length > 2 ? parts[1] : 'default';
   
-  if (contentType === 'section') {
-    type = parts[1] || 'general';
-    titleParts = parts.slice(2);
-  } else {
-    type = contentType;
-    titleParts = parts.slice(1);
-  }
-
-  const title = titleParts
+  // Join remaining parts and capitalize for title
+  const title = parts.slice(parts.length > 2 ? 2 : 1)
     .map(word => word.charAt(0).toUpperCase() + word.slice(1))
     .join(' ');
-    
+
   return {
-    order,
-    title,
+    order: isNaN(order) ? 999 : order,
     type,
-    slug: createSlug(title)
+    title: title || name,
+    slug: name.toLowerCase()
   };
 }
 
 /**
- * Gets media file paths for a section
+ * Gets ordered list of media files from a section directory
  */
-function getMediaPaths(courseName: string, moduleSlug: string, unitSlug: string, sectionSlug: string) {
-  const basePath = `/courses/${courseName}/${moduleSlug}/${unitSlug}/${sectionSlug}`;
+async function getMediaFiles(sectionPath: string) {
+  const files = await fs.readdir(sectionPath);
+  
+  // Group files by type and sort by numeric prefix
+  const audioFiles = files
+    .filter(f => AUDIO_EXTS.includes(path.extname(f)))
+    .sort((a, b) => {
+      const aNum = parseInt(a.split('-')[0]) || 0;
+      const bNum = parseInt(b.split('-')[0]) || 0;
+      return aNum - bNum;
+    })
+    .map(f => path.join(sectionPath, f));
+
+  const imageFiles = files
+    .filter(f => IMAGE_EXTS.includes(path.extname(f)))
+    .sort((a, b) => {
+      const aNum = parseInt(a.split('-')[0]) || 0;
+      const bNum = parseInt(b.split('-')[0]) || 0;
+      return aNum - bNum;
+    })
+    .map(f => path.join(sectionPath, f));
+
   return {
-    audioPath: `${basePath}/audio.mp3`,
-    imagePaths: [`${basePath}/page1.jpg`, `${basePath}/page2.jpg`] // You'll need to know image names
+    audioFiles,
+    imageFiles
   };
 }
 
 /**
- * Extracts course name from path
+ * Recursively builds course structure by reading directory
  */
-function getCourseNameFromPath(path: string): string {
-  const lastSegment = path.split('/').pop();
-  if (lastSegment) {
-    return lastSegment.charAt(0).toUpperCase() + lastSegment.slice(1);
-  }
-  return 'Unknown Course';
-}
+export async function getCourseStructure(coursePath: string): Promise<Course> {
+  const courseInfo = parseFolderName(path.basename(coursePath));
+  
+  // Read module directories
+  const moduleDirs = (await fs.readdir(coursePath, { withFileTypes: true }))
+    .filter(dirent => dirent.isDirectory())
+    .map(dirent => dirent.name);
 
-/**
- * Builds course structure from static paths
- */
-export async function getCourseStructure(courseName: string): Promise<Course> {
-  // This is where you'd define your course structure
-  // Example for Korean course:
-  const moduleStructure = [
-    {
-      name: 'module-1-basics',
-      units: [
-        {
-          name: 'unit-1-greetings',
-          sections: ['1-comprehension-basic', '2-production-practice']
-        }
-      ]
-    }
-    // Add more modules as needed
-  ];
+  // Process each module
+  const modules: Module[] = await Promise.all(
+    moduleDirs.map(async moduleName => {
+      const modulePath = path.join(coursePath, moduleName);
+      const moduleInfo = parseFolderName(moduleName);
 
-  const modules = moduleStructure.map(moduleData => {
-    const moduleMeta = parsePath(moduleData.name, 'module');
-    
-    const units = moduleData.units.map(unitData => {
-      const unitMeta = parsePath(unitData.name, 'unit');
-      
-      const sections = unitData.sections.map(sectionName => {
-        const sectionMeta = parsePath(sectionName, 'section');
-        const media = getMediaPaths(courseName, moduleMeta.slug, unitMeta.slug, sectionMeta.slug);
-        
-        return {
-          ...sectionMeta,
-          ...media
-        };
-      });
+      // Read unit directories
+      const unitDirs = (await fs.readdir(modulePath, { withFileTypes: true }))
+        .filter(dirent => dirent.isDirectory())
+        .map(dirent => dirent.name);
 
-      sections.sort((a, b) => a.order - b.order);
-      
+      // Process each unit
+      const units: Unit[] = await Promise.all(
+        unitDirs.map(async unitName => {
+          const unitPath = path.join(modulePath, unitName);
+          const unitInfo = parseFolderName(unitName);
+
+          // Read section directories
+          const sectionDirs = (await fs.readdir(unitPath, { withFileTypes: true }))
+            .filter(dirent => dirent.isDirectory())
+            .map(dirent => dirent.name);
+
+          // Process each section
+          const sections: Section[] = await Promise.all(
+            sectionDirs.map(async sectionName => {
+              const sectionPath = path.join(unitPath, sectionName);
+              const sectionInfo = parseFolderName(sectionName);
+              const { audioFiles, imageFiles } = await getMediaFiles(sectionPath);
+
+              return {
+                ...sectionInfo,
+                audioFiles,
+                imageFiles
+              };
+            })
+          );
+
+          // Sort sections by order
+          sections.sort((a, b) => a.order - b.order);
+
+          return {
+            ...unitInfo,
+            sections
+          };
+        })
+      );
+
+      // Sort units by order
+      units.sort((a, b) => a.order - b.order);
+
       return {
-        ...unitMeta,
-        sections
+        ...moduleInfo,
+        units
       };
-    });
+    })
+  );
 
-    units.sort((a, b) => a.order - b.order);
-    
-    return {
-      ...moduleMeta,
-      units
-    };
-  });
-
+  // Sort modules by order
   modules.sort((a, b) => a.order - b.order);
 
   return {
-    order: 1,
-    title: getCourseNameFromPath(courseName),
-    slug: createSlug(courseName),
+    ...courseInfo,
     modules
   };
+}
+
+// Helper function to check if a course exists
+export async function courseExists(courseName: string): Promise<boolean> {
+  try {
+    await fs.access(path.join('courses', courseName));
+    return true;
+  } catch {
+    return false;
+  }
 }
