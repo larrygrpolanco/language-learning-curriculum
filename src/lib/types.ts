@@ -69,3 +69,10 @@ export interface PageData {
   module?: Module;
   unit?: Unit;
 }
+
+/// file: src/lib/types.ts
+// Add these to your existing types
+export interface Breadcrumb {
+  title: string;
+  href?: string;
+}
