@@ -1,3 +1,4 @@
+<!-- // src/routes/[course]/[module]/+page.svelte -->
 <script lang="ts">
 	import type { Course, Module } from '$lib/types';
 
@@ -7,7 +8,6 @@
 	};
 </script>
 
-// src/routes/[course]/[module]/+page.svelte
 <div class="container mx-auto px-4 py-8">
 	<!-- Breadcrumb navigation -->
 	<nav class="mb-6 text-sm">

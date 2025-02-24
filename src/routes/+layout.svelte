@@ -1,7 +1,26 @@
-<!-- // src/routes/+layout.svelte -->
+<!-- src/routes/+layout.svelte -->
 <script lang="ts">
-	import '../app.css';
-	let { children } = $props();
+    import CourseLayout from '$lib/components/CourseLayout.svelte';
+    import type { Course, Module, Unit } from '$lib/types';
+    import type { Snippet } from 'svelte';
+    
+    interface LayoutData {
+        courses: Course[];
+        course?: Course;
+        module?: Module;
+        unit?: Unit;
+    }
+
+    let { data, children } = $props<{
+        data: LayoutData;
+        children: Snippet;
+    }>();
 </script>
 
-{@render children()}
+<CourseLayout 
+    course={data.course} 
+    module={data.module} 
+    unit={data.unit}
+>
+    {@render children()}
+</CourseLayout>
